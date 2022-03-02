@@ -1,0 +1,4 @@
+
+build/HierarchicalStateMachineDebug.exe
+build/hsm.o
+build/watch.o
