@@ -1,0 +1,39 @@
+Start ist nicht wirklich definiert, 
+sollte stehen was als erstes gemacht werden sollte.
+Nach manual get es direkt nach dem Start TOP nach setting. 
+
+
+
+
+Event<-1	Watch::hour-SET;
+Event<-1
+Event<-1	Watch::day-SET;
+Event<-1	Watch::month-SET;time:  0:00:00
+Event<-0	Watch::time-DATE;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-0	Watch::date-DATE;time:  0:00:05
+Event<-2	Watch::time-TICK;time:  0:00:06
+Event<-2	Watch::time-TICK;time:  0:00:07
+Event<-2	Watch::time-TICK;time:  0:00:08
+Event<-0	Watch::time-DATE;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+Event<-2	Watch::date-TICK;date: 01-01
+
+
+
+Note: Atuell ist noch nicht klar wie das datum persistiert werden soll, 
+vielleicht einfach mal das Manual lesen.
+
+
+
+
+
+
+
+
+
+ 

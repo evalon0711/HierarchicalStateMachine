@@ -10,7 +10,7 @@
 COMPILATION_MODE ?= Debug
 ENABLE_WARNINGS ?= 0 #todo set default set to 1
 WARNINGS_AS_ERRORS ?= 0
-EXECUTABLE_PREFIX ?= HierarchicalStateMachine
+EXECUTABLE_PREFIX ?= HSM_DigitalWatch
 CPP_COMPILER ?= g++ # g++, clang++
 CPP_STANDARD ?= c++17 # c++11, c++14, c++17, c++20
 

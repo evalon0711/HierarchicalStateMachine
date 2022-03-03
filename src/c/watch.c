@@ -11,7 +11,7 @@ struct Watch {
   Hsm super;
   State timekeeping, time, date;
   State setting, hour, minute, day, month;
-  State *timekeepingHist;
+  State *state_timekeepingHist;
   int tsec, tmin, thour, dday, dmonth;
 };
 
@@ -68,14 +68,14 @@ Msg const *Watch_top(Watch *me, Msg *msg) {
 Msg const *Watch_timekeeping(Watch *me, Msg *msg) {
   switch (msg->evt) {
   case START_EVT:
-    STATE_START(me, me->timekeepingHist);
+    STATE_START(me, me->state_timekeepingHist);
     return 0;
   case Watch_SET_EVT:
     STATE_TRAN(me, &me->setting);
     printf("Watch::timekeeping-SET;");
     return 0;
   case EXIT_EVT:
-    me->timekeepingHist = STATE_CURR(me);
+    me->state_timekeepingHist = STATE_CURR(me);
     return 0;
   } 
   return msg;
@@ -184,7 +184,7 @@ void WatchCtor(Watch *me) {
     StateCtor(&me->month, "month", &me->setting, 
               (EvtHndlr)Watch_month);
 
-  me->timekeepingHist = &me->time; 
+  me->state_timekeepingHist = &me->time; 
 
   me->tsec = me->tmin = me->thour = 0;
   me->dday = me->dmonth = 1;
