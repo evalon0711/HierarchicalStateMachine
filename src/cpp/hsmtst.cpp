@@ -199,15 +199,23 @@ const Msg HsmTestMsg[] = {
     A_SIG,B_SIG,C_SIG,D_SIG,E_SIG,F_SIG,G_SIG,H_SIG
 };
 
+// ----------------------------------------------------------------
+//                      MAIN FUNCTION
+// ----------------------------------------------------------------
+
+
 int main() {
     HsmTest hsmTest;
     hsmTest.onStart();
+
+    printf("\n\nEvent IDs are: ascii code, except of a or h\n");
     for (;;) {
         char c;
         printf("\nEvent<-");
         c = getc(stdin);
         getc(stdin);
         if (c < 'a' || 'h' < c) {
+            printf("\nProgram Exit through wrong input value.");
             break;
         }
         hsmTest.onEvent(&HsmTestMsg[c - 'a']);

@@ -7,10 +7,10 @@
 #include "hsm.h"
 
 class Watch : public Hsm {
-  int tsec, tmin, thour, dday, dmonth; /* t=time, d=date*/
+  int tsec, tmin, thour, dday, dmonth;
 protected:
-  State timekeeping, time, date; /* state, substate*/
-  State setting, hour, minute, day, month; /* */
+  State timekeeping, time, date;
+  State setting, hour, minute, day, month;
   State *timekeepingHist;
 public:
   Watch();
@@ -29,7 +29,7 @@ public:
 };
 
 enum WatchEvents {
-  Watch_MODE_EVT,
+  Watch_DATE_EVT,
   Watch_SET_EVT,
   Watch_TICK_EVT
 };
@@ -43,9 +43,7 @@ void Watch::showDate() {
 }
 
 void Watch::tick() {
-  /* increments date*/
   static int const month[] = { 
-    // Days per month: Jan, Feb,..,Dez
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
   };
   if (++tsec == 60) {
@@ -67,9 +65,7 @@ void Watch::tick() {
 Msg const *Watch::topHndlr(Msg const *msg) {
   switch (msg->evt) {
   case START_EVT:
-    printf("Watch::STATE_START");
-    STATE_START(0);
-    //STATE_START(nullptr);
+    STATE_START(&setting);
     return 0;
   case Watch_TICK_EVT:
     if (++tsec == 60)
@@ -99,7 +95,7 @@ Msg const *Watch::timeHndlr(Msg const *msg) {
   case ENTRY_EVT:
     showTime();
     return 0;
-  case Watch_MODE_EVT:
+  case Watch_DATE_EVT:
     STATE_TRAN(&date);
     printf("Watch::time-DATE;");        
     return 0;
@@ -117,7 +113,7 @@ Msg const *Watch::dateHndlr(Msg const *msg) {
   case ENTRY_EVT:
     showDate();
     return 0;
-  case Watch_MODE_EVT:
+  case Watch_DATE_EVT:
     STATE_TRAN(&time);
     printf("Watch::date-DATE;");        
     return 0;
@@ -195,37 +191,21 @@ Watch::Watch()
 }
 
 const Msg watchMsg[] = { 
-  Watch_MODE_EVT, /* mode event */
-  Watch_SET_EVT, /* switch between timekeeping state or setting state */
+  Watch_DATE_EVT,
+  Watch_SET_EVT,
   Watch_TICK_EVT
 };
-
-
-/****************************************************************************************************************/
-/****************************************************************************************************************/
-/****************************************************************************************************************/
 
 int main() {
   Watch watch;         
   watch.onStart();
-  printf("\nWatch started, available numbers are:\n\
-            Watch_MODE_EVT(0)\ttimekeeping (time <-> date) or setting (increase unit),\n\
-            Watch_SET_EVT(1)\tswitch between timekeeping state or setting state,\n\
-            Watch_TICK_EVT(2)\tincrease sec inside timekeeping\n");
-
   for (;;)  {
     int i;
-    printf("\nEnter Event Number\t\
-    MODE_EVT(0), SET_EVT(1), TICK_EVT(2)\n\
-    Event->");
+    printf("\nEvent<-");
     scanf("%d", &i);
-    //if (i < 0 || static_cast<signed>(sizeof(watchMsg)/sizeof(Msg)) <= i) {
-      if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) {
-      printf("\ninvalid number of Event type. Program exit.\n\n");
+    if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) 
       break;
-    }
     watch.onEvent(&watchMsg[i]); 
   }
-  
   return 0;
 }

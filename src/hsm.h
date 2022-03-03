@@ -8,12 +8,12 @@ struct Msg {
     Event evt;
 };
 
-class Hsm;  /* forward declaration */
+class Hsm;                                           /* forward declaration */
 typedef Msg const *(Hsm::*EvtHndlr)(Msg const *);
 
 class State {
-    State *super;   /* pointer to superstate */
-    EvtHndlr hndlr; /* state's handler function */
+    State *super;                                  /* pointer to superstate */
+    EvtHndlr hndlr;                             /* state's handler function */
     char const *name;
   public:
     State(char const *name, State *super, EvtHndlr hndlr);
@@ -24,19 +24,19 @@ class State {
     friend class Hsm;
 };
 
-class Hsm {             /* Hierarchical State Machine base class */
-    char const *name;   /* pointer to static name */
-    State *curr;        /* current state */
+class Hsm {                        /* Hierarchical State Machine base class */
+    char const *name;                             /* pointer to static name */
+    State *curr;                                           /* current state */
 protected:
-    State *next;    /* next state (non 0 if transition taken) */
-    State *source;  /* source state during last transition */
-    State top;      /* top-most state object */
+    State *next;                  /* next state (non 0 if transition taken) */
+    State *source;                   /* source state during last transition */
+    State top;                                     /* top-most state object */
 public:
-    Hsm(char const *name, EvtHndlr topHndlr);   /* Contructor */
-    void onStart();                             /* enter and start the top state */
-    void onEvent(Msg const *msg);               /* "state machine engine" */
+    Hsm(char const *name, EvtHndlr topHndlr);                       /* Ctor */
+    void onStart();                        /* enter and start the top state */
+    void onEvent(Msg const *msg);                 /* "state machine engine" */
 protected:
-    unsigned char toLCA_(State *target); /*to least common ancestor */
+    unsigned char toLCA_(State *target);
     void exit_(unsigned char toLca);
     State *STATE_CURR() { return curr; }
     void STATE_START(State *target) {
