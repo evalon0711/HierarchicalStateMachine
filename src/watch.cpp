@@ -89,7 +89,7 @@ Msg const *Watch::topHndlr(Msg const *msg) {
   case Watch_TICK_EVT:
     if (++tsec == 60)
       tsec = 0;
-    printf("%sWatch::top-TICK;",KGRN);
+    printf("Watch::top-TICK;");
     showTime();
     return 0;
   } 
@@ -103,7 +103,7 @@ Msg const *Watch::timekeepingHndlr(Msg const *msg) {
     return 0;
   case Watch_SET_EVT:
     STATE_TRAN(&state_setting);
-    printf("%sWatch::timekeeping-SET;\n",KGRN);
+    printf("Watch::timekeeping-SET;\n");
     return 0;
   } 
   return msg;
@@ -117,10 +117,10 @@ Msg const *Watch::timeHndlr(Msg const *msg) {
     return 0;
   case Watch_MODE_EVT:
     STATE_TRAN(&ss_date);
-    printf("%sWatch::time-DATE;\n",KGRN);        
+    printf("Watch::time-DATE;\n");        
     return 0;
   case Watch_TICK_EVT:
-    printf("%sWatch::time-TICK;\n",KGRN);        
+    printf("Watch::time-TICK;\n");        
     tick();
     showTime();
     return 0;
@@ -137,16 +137,13 @@ Msg const *Watch::dateHndlr(Msg const *msg) {
     return 0;
   case Watch_MODE_EVT:
     STATE_TRAN(&ss_time);
-    printf("%sWatch::date-DATE;\n",KGRN);        
+    printf("Watch::date-DATE;\n");        
     return 0;
   case Watch_TICK_EVT:
-    printf("%sWatch::date-TICK;\n",KGRN);        
+    printf("Watch::date-TICK;\n");        
     tick();
     showDate();
     return 0;
-  default: // for debugging reasons
-    printf("Watch::dataHndlr: Event %d does not work \n",msg->evt);
-
   } 
   return msg;
 }
@@ -158,8 +155,6 @@ Msg const *Watch::settingHndlr(Msg const *msg) {
   case START_EVT:
     STATE_START(&ss_hour);
     return 0;
-  default: // for debugging reasons
-    printf("Watch::settingHndlr: Event %d does not work \n",msg->evt);
 
   } 
   return msg;
@@ -171,11 +166,13 @@ Msg const *Watch::hourHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Watch_SET_EVT:
     STATE_TRAN(&ss_minute);
-    printf("%sWatch::hour-SET;",KGRN);
+    printf("Watch::hour-SET;");
     return 0;
-  default: // for debugging reasons
-    printf("Watch::hourHndlr: Event %d does not work \n",msg->evt);
-
+  case Watch_MODE_EVT:
+    if (++thour == 24)
+        thour = 0;
+    printf("Watch::hour-SET: hour++: %d", thour);
+    return 0;
 
   } 
   return msg;
@@ -188,8 +185,6 @@ Msg const *Watch::minuteHndlr(Msg const *msg) {
   case Watch_SET_EVT:
     STATE_TRAN(&ss_day);
     return 0;
-  default: // for debugging reasons
-    printf("Watch::minuteHndlr: Event %d does not work \n",msg->evt);
   } 
   return msg;
 }
@@ -200,10 +195,9 @@ Msg const *Watch::dayHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Watch_SET_EVT:
     STATE_TRAN(&ss_month);
-    printf("%sWatch::day-SET;",KGRN);
+    printf("Watch::day-SET;");
     return 0;
-  default: // for debugging reasons
-    printf("Watch::dayHndlr: Event %d does not work \n",msg->evt);
+  
   } 
   return msg;
 }
@@ -213,10 +207,9 @@ Msg const *Watch::monthHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Watch_SET_EVT:
     STATE_TRAN(&state_timekeeping);
-    printf("%sWatch::month-SET;",KGRN);
+    printf("Watch::month-SET;");
     return 0;
-  default: // for debugging reasons
-    printf("Watch::monthHndlr: Event %d does not work \n",msg->evt);
+  
   } 
   return msg;
 }

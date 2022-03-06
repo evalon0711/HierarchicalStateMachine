@@ -63,16 +63,16 @@ void Hsm::onEvent(Msg const *msg) {
                     trace = entryPath;
                     *trace = 0;
                     for (s = next; s != curr; s = s->super) {
-                        *(++trace) = s;            /* record path to target */
+                        *(++trace) = s; /* record path to target */
                     }
-                    while (s = *trace--) {             /* retrace the entry */
+                    while (s = *trace--) { /* retrace the entry */
                         s->onEvent(this, &entryMsg);
                     }
                     curr = next;
                     next = 0;
                 }
             }
-            break;                                       /* event processed */
+            break; /* event processed */
         }
     }
 }

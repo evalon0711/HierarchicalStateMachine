@@ -8,7 +8,7 @@ struct Msg {
     Event evt;
 };
 
-class Hsm;                                           /* forward declaration */
+class Hsm; /* forward declaration */
 typedef Msg const *(Hsm::*EvtHndlr)(Msg const *);
 
 class State {
