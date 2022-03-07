@@ -3,6 +3,17 @@
 #include <assert.h>
 #include "hsm.h"
 
+/* Entry/exit actions and default tran-
+sitions  are  also  implemented  inside
+the  event  handler  in  response  to  the
+pre-defined  events  ENTRY_EVT,
+EXIT_EVT,  and  START_EVT.  
+The  state
+machine  engine  generates  and  dis-
+patches  these  events  to  appropriate
+handlers  upon  state  transitions. 
+*/
+
 static Msg const startMsg = { START_EVT };
 static Msg const entryMsg = { ENTRY_EVT };
 static Msg const exitMsg  = { EXIT_EVT };
@@ -91,7 +102,23 @@ void Hsm::exit_(unsigned char toLca) {
     curr = s;
 }
 
-/* find # of levels to Least Common Ancestor................................*/
+/* 
+find # of levels to Least Common Ancestor:
+
+Finding the LCA can be expensive
+However,  for  any  given  transition
+the  LCA  needs  to  be  calculated  only
+once. Method HsmToLCA_()returns the
+number  of  levels  from  the  current
+state to the LCA rather than a pointer
+to the LCA state itself. The former is
+the  same  for  all  instances of  a  given
+HSM, that is, it is characteristic of the
+Hsm (sub)class  rather  than  individual
+state machine objects. For this reason
+it  can  be  stored  in  a  static variable
+shared by all instances. 
+*/
 unsigned char Hsm::toLCA_(State *target) {
     State *s, *t;
     unsigned char toLca = 0;
