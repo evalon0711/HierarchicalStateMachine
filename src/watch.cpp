@@ -6,19 +6,23 @@
 #include <stdio.h>
 #include "hsm.h"
 
-#define KGRN "\x1B[32m"
 
 class Watch : public Hsm {
-  int tsec, tmin, thour, dday, dmonth;
+  // date parameters
+  unsigned int tsec, tmin, thour, dday, dmonth;
+
 protected:
   State state_timekeeping;
   // substates of timekeeping
     State ss_time, ss_date;
+
   State state_setting;
   // substates of setting
     State ss_hour, ss_minute, ss_day, ss_month;
-    // 
+
+  // 
   State *state_timekeepingHist;
+
 public:
   Watch();
   /* All Transitions have to defined and created for the state machine. */
@@ -36,6 +40,16 @@ public:
   void tick();
   void showTime();
   void showDate();
+
+private:
+
+  static constexpr unsigned int cHoursOnDay=24;
+  static constexpr unsigned int cMinutesInHour=60;
+  static constexpr unsigned int cSecondsInMinute=60;
+  static constexpr unsigned int cMonthInYear=12;
+  static constexpr unsigned int cReset0=0;
+  unsigned int const cDaysPerMonth[cMonthInYear]={/* Jan, Feb, ... ,Dez */31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+ 
 };
 
 // ----------------------------------------------------------------------------------------
@@ -55,28 +69,30 @@ void Watch::showTime() {
 }
 
 void Watch::showDate() {
-  printf("date: %02d-%02d", dmonth, dday);
+  // todo year is missing
+  printf("date: %02d-%02d-0000", dday, dmonth);
 }
 
 void Watch::tick() {
-  static int const month[] = { 
-    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
-  };
-  if (++tsec == 60) {
-    tsec = 0;
-    if (++tmin == 60) {
-      tmin = 0;
-      if (++thour == 24) {
-        thour = 0;
-        if (++dday == month[dmonth-1]+1) {
+  /* with each call the time is incremented by one second.  */
+
+  if (++tsec == cSecondsInMinute) {
+    tsec = cReset0;
+    if (++tmin == cMinutesInHour) {
+      tmin = cReset0;
+      if (++thour == cHoursOnDay) {
+        thour = cReset0;
+        if (++dday == cDaysPerMonth[dmonth-1]+1) {
           dday = 1;
-          if (++dmonth == 13) 
+          if (++dmonth == cMonthInYear+1) 
             dmonth = 1;
+            /* todo increase year, todo add year as well */
         }
       }
     }
   }
 }
+
 /*  */
 
 /* TBD: Watch_TICK_EVT, can be used, but makes confsion. Usually first state should be named for user.  */
@@ -87,8 +103,8 @@ Msg const *Watch::topHndlr(Msg const *msg) {
     printf("Watch::topHndlr::STATE_START;\n");
     return 0;
   case Watch_TICK_EVT:
-    if (++tsec == 60)
-      tsec = 0;
+    if (++tsec == cMinutesInHour)
+      tsec = cReset0;
     printf("Watch::top-TICK;");
     showTime();
     return 0;
@@ -169,11 +185,10 @@ Msg const *Watch::hourHndlr(Msg const *msg) {
     printf("Watch::hour-SET;");
     return 0;
   case Watch_MODE_EVT:
-    if (++thour == 24)
-        thour = 0;
+    if (++thour == cHoursOnDay)
+        thour = cReset0;
     printf("Watch::hour-SET: hour++: %d", thour);
-    return 0;
-
+    return 0; //todo clarify which number shall be used as return value
   } 
   return msg;
 }
@@ -185,6 +200,11 @@ Msg const *Watch::minuteHndlr(Msg const *msg) {
   case Watch_SET_EVT:
     STATE_TRAN(&ss_day);
     return 0;
+  case Watch_MODE_EVT:
+    if (++tmin == cMinutesInHour)
+        tmin = cReset0;
+    printf("Watch::min-SET: min++: %d", tmin);
+    return 0; //todo clarify which number shall be used as return value
   } 
   return msg;
 }
@@ -197,8 +217,13 @@ Msg const *Watch::dayHndlr(Msg const *msg) {
     STATE_TRAN(&ss_month);
     printf("Watch::day-SET;");
     return 0;
+  case Watch_MODE_EVT:
+    if (++dday == Watch::cDaysPerMonth[dmonth-1]+1) 
+      dday = 1;
+    printf("Watch::day-SET: day++: %d", dday);
+    return 0; //todo clarify which number shall be used as return value
+  }
   
-  } 
   return msg;
 }
 
@@ -209,10 +234,16 @@ Msg const *Watch::monthHndlr(Msg const *msg) {
     STATE_TRAN(&state_timekeeping);
     printf("Watch::month-SET;");
     return 0;
-  
+  case Watch_MODE_EVT:
+    if (++dmonth == cMonthInYear+1) 
+            dmonth = 1;
+    printf("Watch::month-SET: hour++: %d", dmonth);
+    return 0; //todo clarify which number shall be used as return value
   } 
   return msg;
 }
+
+/* todo year Handler where the year can be set. */
 
 
 /* Watch Constructor */
@@ -231,7 +262,12 @@ Watch::Watch()
   ss_day("day", &state_setting, (EvtHndlr)&Watch::dayHndlr),
   ss_month("month", &state_setting, (EvtHndlr)&Watch::monthHndlr),
   // define members
-  tsec(0), tmin(0), thour(0), dday(1), dmonth(1)
+  tsec(cReset0), tmin(cReset0), thour(cReset0), dday(1), dmonth(1)
+  /* cDaysPerMonth{ 
+    // Jan, Feb, .............................,Dez
+    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
+    }
+ */
 {
   state_timekeepingHist = &ss_time; 
 }
@@ -252,7 +288,7 @@ int main() {
   watch.onStart();
   for (;;)  {
     int i;
-    printf("\nEvent[0=mode,1=set,2=tick]<-");
+    printf("\nEvent[0=mode,1=set,2=tick]->");
     scanf("%d", &i);
     if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) 
       break;
