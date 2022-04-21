@@ -1,36 +1,16 @@
 /**
- * Simple digital watch example
- * M. Samek, 01/07/00
+ * Simple digital car example
+ * k.hiltl 21/04/2022
  */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-To illustrate the use of the HSM pattern,  consider  a  simple  digital  watch.  
-The  watch  has  two  buttons—which  generate  external events—and  an  internally  generated
-tick event.  
-The  different  events  are handled  differently  depending  upon the  mode  of  operation.  
-The  basic watch operates as follows:
-
-• In timekeeping mode, the user can toggle  between  displaying  date  or  current  time  by  pressing  the
-“mode” button
-• Pressing  the  “set”  button  switches  the watch into setting mode. The sequence  of  adjustments  in  this
-mode is: hour, minute, day, month.
-Adjustments are made by pressing the  “mode”  button,  which  increments the chosen quantity by one.
-Pressing  the  “set”  button  while adjusting  month  puts  the  watch back into timekeeping mode
-• While  in  setting mode  the  watch ignores tick events
-• Upon return to timekeeping mode the watch displays the most recently  selected  information,  that  is,  if
-date  was  selected  prior  to  leaving timekeeping mode,  the  watch resumes displaying the date, otherwise 
-it displays the current time
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 We apply the HSM pattern according to the following recipe:
-1. Declare a new class, inheriting from Hsm class (the Watch class) 
+1. Declare a new class, inheriting from Hsm class (the Car class) 
 2. Put into this new class all states (State class instances) and other attributes (tsec, tmin, thour, and so on)
 3. Declare an event handler method (member function) for every state.
    Don’t forget to declare event handlers for inherited states, like top, 
    whose behavior you intend to customize
-4. Define the state machine topology (nesting of states) in the new class (the Watch class) constructor
+4. Define the state machine topology (nesting of states) in the new class (the Car class) constructor
 5. Define events for the state machine (for example, as enumeration).
    You can use event-types starting from 0, because the pre-defined events use the upper limit of the Event type range.
 6. Define event handler methods.
@@ -46,16 +26,14 @@ We apply the HSM pattern according to the following recipe:
 #include "hsm.h"
 
 
-class Watch : public Hsm {
+class Car : public Hsm {
  // date parameters
   unsigned int tsec, tmin, thour, dday, dmonth, dyear=2018;
 
 protected:
-  State state_timekeeping;
-  // substates of timekeeping
-    State ss_time, ss_date;
+  State state_off;
 
-  State state_setting;
+  State state_on;
   // substates of setting
     State ss_hour, ss_minute, ss_day, ss_month;
 
@@ -63,7 +41,7 @@ protected:
   State *state_timekeepingHist;
 
 public:
-  Watch();
+  Car();
   /* All Transitions have to defined and created for the state machine. */
   /* Typically this is achieved using a single-level switch statement. Event handlers  communicate  with  the  state
      machine  engine through  a  return  value  of  type  Msg*.
@@ -75,12 +53,12 @@ public:
 
   /* declare event handlers for inherited states, like top, whose behavior you intend to customize */
   Msg const *topHndlr(Msg const *msg);  
-  /* for state timekeeping */
-  Msg const *timekeepingHndlr(Msg const *msg);  
-  /* for substate time */
-  Msg const *timeHndlr(Msg const *msg);  
+  /* state_off */
+  Msg const *state_offHndlr(Msg const *msg);  
+  
+  // Msg const *timeHndlr(Msg const *msg);  
   /* for substate date */
-  Msg const *dateHndlr(Msg const *msg);  
+  // Msg const *dateHndlr(Msg const *msg);  
   /* for state setting */
   Msg const *settingHndlr(Msg const *msg);  
   /* for substate hour */
@@ -114,22 +92,22 @@ private:
   const Msg* cEventIsProcessed=0;
 
 public:
-enum WatchEvents {
-  Watch_MODE_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
-  Watch_SET_EVT, /* Pressing the “set” button switches the watch into setting mode.  */
-  Watch_TICK_EVT /*  */
+enum CarEvents {
+  Car_MODE_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
+  Car_SET_EVT, /* Pressing the “set” button switches the car into setting mode.  */
+  Car_TICK_EVT /*  */
 };
 
 };
 
 /* Εvents */
-const Msg watchMsg[] = { 
-  Watch::WatchEvents::Watch_MODE_EVT, // Button
-  Watch::WatchEvents::Watch_SET_EVT, // Button
-  Watch::WatchEvents::Watch_TICK_EVT // trigger of seconds, done manually.
+const Msg carMsg[] = { 
+  Car::CarEvents::Car_MODE_EVT, // Button
+  Car::CarEvents::Car_SET_EVT, // Button
+  Car::CarEvents::Car_TICK_EVT // trigger of seconds, done manually.
 
 /*  Pressing the “set” button switches
-the watch into setting mode. 
+the car into setting mode. 
 
 The sequence of adjustments in this
 mode is: hour, minute, day, month.
@@ -139,84 +117,84 @@ the “mode” button, which incre-
 ments the chosen quantity by one.
 
 Pressing the “set” button while
-adjusting month puts the watch
+adjusting month puts the car
 back into timekeeping mode
 
-• While in setting mode the watch
+• While in setting mode the car
 ignores tick events
 
 • Upon return to timekeeping mode
-the watch displays the most recently selected information, that is, if
+the car displays the most recently selected information, that is, if
 date was selected prior to leaving
-timekeeping mode, the watch
+timekeeping mode, the car
 resumes displaying the date, other-
 wise it displays the current time */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-  Create and run the HSM Watch as a static function, 
+  Create and run the HSM Car as a static function, 
   which shall be placed in main function
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static int HSM_Watch(void)
+static int HSM_Car(void)
 {
-Watch watch;         
-  watch.onStart();
+Car car;         
+  car.onStart();
   printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
   while (1)  {
     int i;
     printf("\nEvent[0=mode,1=set,2=tick]->");
     scanf("%d", &i);
-    if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) 
+    if (i < 0 || sizeof(carMsg)/sizeof(Msg) <= i) 
       break;
-    watch.onEvent(&watchMsg[i]);     
+    car.onEvent(&carMsg[i]);     
   }
-  printf("\n\nWatch Application finished.Exit.\n\n");
+  printf("\n\nCar Application finished.Exit.\n\n");
   return 0;
 
 }
 
 /* set the date automatically to test if statemachine works */
-static int test_HSM_Watch(int hour=7,
+static int test_HSM_Car(int hour=7,
                           int minute=7,
                           int day=5,
                           int month=12
 )
 {
 
-  Watch watch;         
-  watch.onStart();
+  Car car;         
+  car.onStart();
 
   printf("\n");
   
   for (int h=0; h<hour; h++)
   {
-    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
+    car.onEvent(&carMsg[Car::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
+  car.onEvent(&carMsg[Car::SET]); printf("\n");
 
   for (int m=0; m<minute; m++)
   {
-    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
+    car.onEvent(&carMsg[Car::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
+  car.onEvent(&carMsg[Car::SET]); printf("\n");
 
   
   for (int m=0; m<day-1; m++)
   {
-    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
+    car.onEvent(&carMsg[Car::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
+  car.onEvent(&carMsg[Car::SET]); printf("\n");
 
   for (int m=0; m<month-1; m++)
   {
-    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
+    car.onEvent(&carMsg[Car::MODE]); printf("\n");
   }
   // leave setting status
-  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
-  watch.onEvent(&watchMsg[Watch::TICK]);printf("\n");
+  car.onEvent(&carMsg[Car::SET]); printf("\n");
+  car.onEvent(&carMsg[Car::TICK]);printf("\n");
   // show date by clicking mode button
-  watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
+  car.onEvent(&carMsg[Car::MODE]); printf("\n");
 
   // printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
   printf("\n\nThis is the test function, if 05-12-2018 07:07:01 succeed \n\n");

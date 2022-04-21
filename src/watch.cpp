@@ -75,9 +75,9 @@ Msg const *Watch::timekeepingHndlr(Msg const *msg) {
   return msg;
 }
 
-/* time Handler covers all events 
-
-*/
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+General: Handler definition for each state, covers all events 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 Msg const *Watch::timeHndlr(Msg const *msg) {
