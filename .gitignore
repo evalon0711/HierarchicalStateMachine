@@ -3,3 +3,6 @@ build/HierarchicalStateMachineDebug.exe
 build/hsm.o
 build/watch.o
 *.exe
+build/main_watch.o
+build/main_HSMs.o
+build/car.o
