@@ -148,7 +148,7 @@ static int HSM_Watch(void)
 Watch watch;         
   watch.onStart();
   printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
-  for (;;)  {
+  while (1)  {
     int i;
     printf("\nEvent[0=mode,1=set,2=tick]->");
     scanf("%d", &i);
@@ -160,4 +160,66 @@ Watch watch;
   return 0;
 
 }
+
+/* set the date automatically to test if statemachine works */
+static int test_HSM_Watch(int hour=7,
+                          int minute=7,
+                          int day=5,
+                          int month=12
+)
+{
+
+  Watch watch;         
+  watch.onStart();
+
+  constexpr int MODE=0;
+  constexpr int SET=1;
+  constexpr int TICK=2;
+  printf("\n");
+  // go to setting into hour
+  // watch.onEvent(&watchMsg[MODE]);
+  
+  for (int h=0; h<hour; h++)
+  {
+    watch.onEvent(&watchMsg[MODE]); printf("\n");
+  }
+  watch.onEvent(&watchMsg[SET]); printf("\n");
+
+  for (int m=0; m<minute; m++)
+  {
+    watch.onEvent(&watchMsg[MODE]); printf("\n");
+  }
+  watch.onEvent(&watchMsg[SET]);
+
+  
+  for (int m=0; m<day-1; m++)
+  {
+    watch.onEvent(&watchMsg[MODE]); printf("\n");
+  }
+  watch.onEvent(&watchMsg[SET]);
+
+  for (int m=0; m<month-1; m++)
+  {
+    watch.onEvent(&watchMsg[MODE]); printf("\n");
+  }
+  watch.onEvent(&watchMsg[SET]);printf("\n");
+  watch.onEvent(&watchMsg[TICK]);printf("\n");
+    watch.onEvent(&watchMsg[MODE]); printf("\n");
+
+  // printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
+  printf("\n\nThis is the test function\n\n");
+  while (1)  {
+    int i;
+    printf("\nEvent[0=mode,1=set,2=tick]->");
+    scanf("%d", &i);
+    if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) 
+      break;
+    watch.onEvent(&watchMsg[i]);
+  }
+  printf("\n\nWatch Application finished.Exit.\n\n");
+  return 0;
+
+}
+
+
 

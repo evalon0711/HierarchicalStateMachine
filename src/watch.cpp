@@ -157,7 +157,7 @@ Msg const *Watch::minuteHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Watch_SET_EVT:
     STATE_TRAN(&ss_day);
-    printf("Watch:: go to day chaning");
+    printf("Watch:: go to day changing");
     return cEventIsProcessed;
   case Watch_MODE_EVT:
     if (++tmin == cMinutesInHour)
