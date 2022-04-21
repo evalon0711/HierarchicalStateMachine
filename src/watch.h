@@ -86,6 +86,12 @@ public:
   void tick();
   void showTime();
   void showDate();
+  
+  /* Consts */
+  static constexpr int MODE=0;
+  static constexpr int SET=1;
+  static constexpr int TICK=2;
+
 
 private:
 
@@ -172,53 +178,44 @@ static int test_HSM_Watch(int hour=7,
   Watch watch;         
   watch.onStart();
 
-  constexpr int MODE=0;
-  constexpr int SET=1;
-  constexpr int TICK=2;
   printf("\n");
-  // go to setting into hour
-  // watch.onEvent(&watchMsg[MODE]);
   
   for (int h=0; h<hour; h++)
   {
-    watch.onEvent(&watchMsg[MODE]); printf("\n");
+    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[SET]); printf("\n");
+  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
 
   for (int m=0; m<minute; m++)
   {
-    watch.onEvent(&watchMsg[MODE]); printf("\n");
+    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[SET]);
+  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
 
   
   for (int m=0; m<day-1; m++)
   {
-    watch.onEvent(&watchMsg[MODE]); printf("\n");
+    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[SET]);
+  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
 
   for (int m=0; m<month-1; m++)
   {
-    watch.onEvent(&watchMsg[MODE]); printf("\n");
+    watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
   }
-  watch.onEvent(&watchMsg[SET]);printf("\n");
-  watch.onEvent(&watchMsg[TICK]);printf("\n");
-    watch.onEvent(&watchMsg[MODE]); printf("\n");
+  // leave setting status
+  watch.onEvent(&watchMsg[Watch::SET]); printf("\n");
+  watch.onEvent(&watchMsg[Watch::TICK]);printf("\n");
+  // show date by clicking mode button
+  watch.onEvent(&watchMsg[Watch::MODE]); printf("\n");
 
   // printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
-  printf("\n\nThis is the test function\n\n");
-  while (1)  {
-    int i;
-    printf("\nEvent[0=mode,1=set,2=tick]->");
-    scanf("%d", &i);
-    if (i < 0 || sizeof(watchMsg)/sizeof(Msg) <= i) 
-      break;
-    watch.onEvent(&watchMsg[i]);
-  }
-  printf("\n\nWatch Application finished.Exit.\n\n");
-  return 0;
+  printf("\n\nThis is the test function, if 05-12-2018 07:07:01 succeed \n\n");
 
+  /*  
+    here would be the while (1) loop
+  */
+  return 0;
 }
 
 
