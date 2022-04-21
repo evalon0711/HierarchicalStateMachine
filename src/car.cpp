@@ -65,7 +65,7 @@ otherwise it displays the current time.
 Msg const *Car::state_offHndlr(Msg const *msg) {
   switch (msg->evt) {
   case START_EVT:
-    STATE_START(state_timekeepingHist);
+    STATE_START(state_History);
     return cEventIsProcessed;
   case Car_SET_EVT:
     STATE_TRAN(&state_on);
@@ -84,7 +84,7 @@ General: Handler definition for each state, covers all events
 Msg const *Car::settingHndlr(Msg const *msg) {
   switch (msg->evt) {
   case START_EVT:
-    STATE_START(&ss_hour);
+    STATE_START(&ss_stehen);
     return cEventIsProcessed;
 
   } 
@@ -96,7 +96,7 @@ Msg const *Car::settingHndlr(Msg const *msg) {
 Msg const *Car::hourHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
-    STATE_TRAN(&ss_minute);
+    STATE_TRAN(&ss_fahren);
     printf("Car::go to hour change");
     return cEventIsProcessed;
   case Car_MODE_EVT:
@@ -191,14 +191,14 @@ Car::Car()
   // State
   state_on("setting", &top, (EvtHndlr)&Car::settingHndlr),
   // substates
-  ss_hour("hour", &state_on, (EvtHndlr)&Car::hourHndlr),
-  ss_minute("minute", &state_on, (EvtHndlr)&Car::minuteHndlr),
+  ss_stehen("hour", &state_on, (EvtHndlr)&Car::hourHndlr),
+  ss_fahren("minute", &state_on, (EvtHndlr)&Car::minuteHndlr),
   ss_day("day", &state_on, (EvtHndlr)&Car::dayHndlr),
   ss_month("month", &state_on, (EvtHndlr)&Car::monthHndlr),
   // define members
   tsec(cReset0), tmin(cReset0), thour(cReset0), dday(1), dmonth(1)
 {
-  state_timekeepingHist = &state_off; 
+  state_History = &state_off; 
 }
 
 

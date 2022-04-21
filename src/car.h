@@ -34,11 +34,15 @@ protected:
   State state_off;
 
   State state_on;
-  // substates of setting
-    State ss_hour, ss_minute, ss_day, ss_month;
+  //todo substates of setting
+  //todo stehen
+    State ss_stehen, ss_fahren, ss_day, ss_month;
+  //todo fahren
+  //todo gang1, gang2, gang3, Rückwärtsgang
+  // State sss_
 
   // 
-  State *state_timekeepingHist;
+  State *state_History;
 
 public:
   Car();
