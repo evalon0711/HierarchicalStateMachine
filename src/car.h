@@ -6,10 +6,13 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 We apply the HSM pattern according to the following recipe:
 1. Declare a new class, inheriting from Hsm class (the Car class) 
-2. Put into this new class all states (State class instances) and other attributes (tsec, tmin, thour, and so on)
+   done
+2. Put into this new class all states (State class instances) and other attributes 
+   done
 3. Declare an event handler method (member function) for every state.
    Don’t forget to declare event handlers for inherited states, like top, 
    whose behavior you intend to customize
+   
 4. Define the state machine topology (nesting of states) in the new class (the Car class) constructor
 5. Define events for the state machine (for example, as enumeration).
    You can use event-types starting from 0, because the pre-defined events use the upper limit of the Event type range.
@@ -34,12 +37,10 @@ protected:
   State state_off;
 
   State state_on;
-  //todo substates of setting
-  //todo stehen
-    State ss_stehen, ss_fahren, ss_day, ss_month;
-  //todo fahren
-  //todo gang1, gang2, gang3, Rückwärtsgang
-  // State sss_
+  //substates of state_on
+    State ss_park;
+    State ss_drive;
+      State drive_ss_drive1 ,drive_ss_idle, drive_ss_reverseGear;
 
   // 
   State *state_History;

@@ -84,7 +84,7 @@ General: Handler definition for each state, covers all events
 Msg const *Car::settingHndlr(Msg const *msg) {
   switch (msg->evt) {
   case START_EVT:
-    STATE_START(&ss_stehen);
+    STATE_START(&ss_park);
     return cEventIsProcessed;
 
   } 
@@ -96,7 +96,7 @@ Msg const *Car::settingHndlr(Msg const *msg) {
 Msg const *Car::hourHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
-    STATE_TRAN(&ss_fahren);
+    STATE_TRAN(&ss_drive);
     printf("Car::go to hour change");
     return cEventIsProcessed;
   case Car_MODE_EVT:
@@ -116,7 +116,7 @@ Msg const *Car::hourHndlr(Msg const *msg) {
 Msg const *Car::minuteHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
-    STATE_TRAN(&ss_day);
+    // STATE_TRAN(&ss_day);
     printf("Car:: go to day changing");
     return cEventIsProcessed;
   case Car_MODE_EVT:
@@ -134,7 +134,7 @@ Msg const *Car::minuteHndlr(Msg const *msg) {
 Msg const *Car::dayHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
-    STATE_TRAN(&ss_month);
+    // STATE_TRAN(&ss_month);
     printf("Car:: go to month ");
     return cEventIsProcessed;
   case Car_MODE_EVT:
@@ -186,15 +186,19 @@ composite.
 Car::Car() 
 : Hsm("Car", (EvtHndlr)topHndlr),
   //  State
-  state_off("timekeeping", &top, (EvtHndlr)&Car::state_offHndlr),
+  state_off("OFF", &top, (EvtHndlr)&Car::state_offHndlr),
   
   // State
-  state_on("setting", &top, (EvtHndlr)&Car::settingHndlr),
+  state_on("ON", &top, (EvtHndlr)&Car::settingHndlr),
   // substates
-  ss_stehen("hour", &state_on, (EvtHndlr)&Car::hourHndlr),
-  ss_fahren("minute", &state_on, (EvtHndlr)&Car::minuteHndlr),
-  ss_day("day", &state_on, (EvtHndlr)&Car::dayHndlr),
-  ss_month("month", &state_on, (EvtHndlr)&Car::monthHndlr),
+  ss_park("ON:PARK", &state_on, (EvtHndlr)&Car::hourHndlr),
+  ss_drive("ON:DRIVE", &state_on, (EvtHndlr)&Car::minuteHndlr),
+  drive_ss_idle("ON:DRIVE:drive_ss_idle", &state_on, (EvtHndlr)&Car::minuteHndlr),
+  drive_ss_drive1("ON:DRIVE:drive_ss_drive1", &state_on, (EvtHndlr)&Car::minuteHndlr),
+  drive_ss_reverseGear("ON:DRIVE:drive_ss_reverseGear", &state_on, (EvtHndlr)&Car::minuteHndlr),
+
+  // ss_day("day", &state_on, (EvtHndlr)&Car::dayHndlr),
+  // ss_month("month", &state_on, (EvtHndlr)&Car::monthHndlr),
   // define members
   tsec(cReset0), tmin(cReset0), thour(cReset0), dday(1), dmonth(1)
 {
