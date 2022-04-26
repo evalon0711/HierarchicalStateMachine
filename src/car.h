@@ -7,21 +7,36 @@
 We apply the HSM pattern according to the following recipe:
 1. Declare a new class, inheriting from Hsm class (the Car class) 
    done
+
 2. Put into this new class all states (State class instances) and other attributes 
    done
+
 3. Declare an event handler method (member function) for every state.
    Don’t forget to declare event handlers for inherited states, like top, 
-   whose behavior you intend to customize
-   
+   whose behavior you intend to customize.
+   done
+
+
 4. Define the state machine topology (nesting of states) in the new class (the Car class) constructor
+   done
+
+
 5. Define events for the state machine (for example, as enumeration).
    You can use event-types starting from 0, because the pre-defined events use the upper limit of the Event type range.
+
+
 6. Define event handler methods.
    Code entry/exit actions and start-up transitions as response to pre-defined events ENTRY_EVT,EXIT_EVT, and START_EVT, 
    respectively. Provide code for other events using STATE_TRAN() macro for state transitions. Remember to return 0
    (NULL pointer) if you handle the event and the initial message pointer if you don’t
+
+
 7. Execute the initial start transition by invoking Hsm::onStart()
+
+
 8. Arrange to invoke Hsm::onEvent() for each incoming event
+
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <assert.h>
@@ -58,22 +73,13 @@ public:
 
   /* declare event handlers for inherited states, like top, whose behavior you intend to customize */
   Msg const *topHndlr(Msg const *msg);  
-  /* state_off */
   Msg const *state_offHndlr(Msg const *msg);  
-  
-  // Msg const *timeHndlr(Msg const *msg);  
-  /* for substate date */
-  // Msg const *dateHndlr(Msg const *msg);  
-  /* for state setting */
-  Msg const *settingHndlr(Msg const *msg);  
-  /* for substate hour */
-  Msg const *hourHndlr(Msg const *msg);  
-  /* for substate minute */
-  Msg const *minuteHndlr(Msg const *msg);  
-  /* for substate minute */
-  Msg const *dayHndlr(Msg const *msg);  
-  /* for substate month */
-  Msg const *monthHndlr(Msg const *msg);  
+  Msg const *state_onHndlr(Msg const *msg); 
+  Msg const *ss_parkHndlr(Msg const *msg);
+  Msg const *ss_driveHndlr(Msg const *msg);  
+  Msg const *drive_ss_idleHndlr(Msg const *msg);
+  Msg const *drive_ss_drive1Hndlr(Msg const *msg);
+  Msg const *drive_ss_reverseGearHndlr(Msg const *msg);
 
   /* Standard functions, to show behaviour */
   void tick();
@@ -110,30 +116,6 @@ const Msg carMsg[] = {
   Car::CarEvents::Car_MODE_EVT, // Button
   Car::CarEvents::Car_SET_EVT, // Button
   Car::CarEvents::Car_TICK_EVT // trigger of seconds, done manually.
-
-/*  Pressing the “set” button switches
-the car into setting mode. 
-
-The sequence of adjustments in this
-mode is: hour, minute, day, month.
-
-Adjustments are made by pressing
-the “mode” button, which incre-
-ments the chosen quantity by one.
-
-Pressing the “set” button while
-adjusting month puts the car
-back into timekeeping mode
-
-• While in setting mode the car
-ignores tick events
-
-• Upon return to timekeeping mode
-the car displays the most recently selected information, that is, if
-date was selected prior to leaving
-timekeeping mode, the car
-resumes displaying the date, other-
-wise it displays the current time */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

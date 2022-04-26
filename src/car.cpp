@@ -41,6 +41,12 @@ void Car::tick() {
 /*  */
 
 /* TBD: Car_TICK_EVT, can be used, but makes confsion. Usually first state should be named for user.  */
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+General: Handler definition for each state, covers all events 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 Msg const *Car::topHndlr(Msg const *msg) {
   switch (msg->evt) {
   case START_EVT:
@@ -75,25 +81,10 @@ Msg const *Car::state_offHndlr(Msg const *msg) {
   return msg;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-General: Handler definition for each state, covers all events 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 /*  */
-Msg const *Car::settingHndlr(Msg const *msg) {
-  switch (msg->evt) {
-  case START_EVT:
-    STATE_START(&ss_park);
-    return cEventIsProcessed;
-
-  } 
-  return msg;
-}
-
-
-/*  */
-Msg const *Car::hourHndlr(Msg const *msg) {
+Msg const *Car::state_onHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
     STATE_TRAN(&ss_drive);
@@ -113,7 +104,7 @@ Msg const *Car::hourHndlr(Msg const *msg) {
 
 
 /*  */
-Msg const *Car::minuteHndlr(Msg const *msg) {
+Msg const *Car::ss_parkHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
     // STATE_TRAN(&ss_day);
@@ -131,7 +122,7 @@ Msg const *Car::minuteHndlr(Msg const *msg) {
 
 
 /*  */
-Msg const *Car::dayHndlr(Msg const *msg) {
+Msg const *Car::ss_driveHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
     // STATE_TRAN(&ss_month);
@@ -147,8 +138,11 @@ Msg const *Car::dayHndlr(Msg const *msg) {
   return msg;
 }
 
+
+
+
 /*  */
-Msg const *Car::monthHndlr(Msg const *msg) {
+Msg const *Car::drive_ss_idleHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_SET_EVT:
   /* Pressing the “set” button while adjusting month puts the car back into timekeeping mode. */
@@ -164,6 +158,43 @@ Msg const *Car::monthHndlr(Msg const *msg) {
   /* While in setting mode the car ignores tick events */
   return msg;
 }
+
+Msg const *Car::drive_ss_drive1Hndlr(Msg const *msg) {
+  switch (msg->evt) {
+  case Car_SET_EVT:
+  /* Pressing the “set” button while adjusting month puts the car back into timekeeping mode. */
+    STATE_TRAN(&state_off);
+    printf("Car:: go back to timekeeping");
+    return cEventIsProcessed;
+  case Car_MODE_EVT:
+    if (++dmonth == cMonthInYear+1) 
+            dmonth = 1;
+    printf("Car::month-SET: month++: %d", dmonth);
+    return cEventIsProcessed; 
+  } 
+  /* While in setting mode the car ignores tick events */
+  return msg;
+}
+
+
+Msg const *Car::drive_ss_reverseGearHndlr(Msg const *msg) {
+  switch (msg->evt) {
+  case Car_SET_EVT:
+  /* Pressing the “set” button while adjusting month puts the car back into timekeeping mode. */
+    STATE_TRAN(&state_off);
+    printf("Car:: go back to timekeeping");
+    return cEventIsProcessed;
+  case Car_MODE_EVT:
+    if (++dmonth == cMonthInYear+1) 
+            dmonth = 1;
+    printf("Car::month-SET: month++: %d", dmonth);
+    return cEventIsProcessed; 
+  } 
+  /* While in setting mode the car ignores tick events */
+  return msg;
+}
+
+
 
 /* todo year Handler where the year can be set. */
 
@@ -187,18 +218,17 @@ Car::Car()
 : Hsm("Car", (EvtHndlr)topHndlr),
   //  State
   state_off("OFF", &top, (EvtHndlr)&Car::state_offHndlr),
-  
   // State
-  state_on("ON", &top, (EvtHndlr)&Car::settingHndlr),
+  state_on("ON", &top, (EvtHndlr)&Car::state_onHndlr),
   // substates
-  ss_park("ON:PARK", &state_on, (EvtHndlr)&Car::hourHndlr),
-  ss_drive("ON:DRIVE", &state_on, (EvtHndlr)&Car::minuteHndlr),
-  drive_ss_idle("ON:DRIVE:drive_ss_idle", &state_on, (EvtHndlr)&Car::minuteHndlr),
-  drive_ss_drive1("ON:DRIVE:drive_ss_drive1", &state_on, (EvtHndlr)&Car::minuteHndlr),
-  drive_ss_reverseGear("ON:DRIVE:drive_ss_reverseGear", &state_on, (EvtHndlr)&Car::minuteHndlr),
+  ss_park("ON:PARK", &state_on, (EvtHndlr)&Car::ss_parkHndlr),
+  ss_drive("ON:DRIVE", &state_on, (EvtHndlr)&Car::ss_driveHndlr),
+  // substates of drive
+  // todo is it possible to get an additional level down? 
+  drive_ss_idle("ON:DRIVE:drive_ss_idle", &ss_drive, (EvtHndlr)&Car::drive_ss_idleHndlr),
+  drive_ss_drive1("ON:DRIVE:drive_ss_drive1", &ss_drive, (EvtHndlr)&Car::drive_ss_drive1Hndlr),
+  drive_ss_reverseGear("ON:DRIVE:drive_ss_reverseGear", &ss_drive, (EvtHndlr)&Car::drive_ss_reverseGearHndlr),
 
-  // ss_day("day", &state_on, (EvtHndlr)&Car::dayHndlr),
-  // ss_month("month", &state_on, (EvtHndlr)&Car::monthHndlr),
   // define members
   tsec(cReset0), tmin(cReset0), thour(cReset0), dday(1), dmonth(1)
 {
