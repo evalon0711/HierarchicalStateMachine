@@ -55,6 +55,7 @@ protected:
   //substates of state_on
     State ss_park;
     State ss_drive;
+    //substates of substate drive
       State drive_ss_drive1 ,drive_ss_idle, drive_ss_reverseGear;
 
   // 
@@ -82,9 +83,9 @@ public:
   Msg const *drive_ss_reverseGearHndlr(Msg const *msg);
 
   /* Standard functions, to show behaviour */
-  void tick();
-  void showTime();
-  void showDate();
+  void individualFunction3();
+  void individualFunction1();
+  void individualFunction();
   
   /* Consts */
   static constexpr int MODE=0;
@@ -106,7 +107,7 @@ public:
 enum CarEvents {
   Car_MODE_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
   Car_SET_EVT, /* Pressing the “set” button switches the car into setting mode.  */
-  Car_TICK_EVT /*  */
+  Car_STATUS_EVT /* Shall represent in which status the CAR is.  */
 };
 
 };
@@ -115,7 +116,7 @@ enum CarEvents {
 const Msg carMsg[] = { 
   Car::CarEvents::Car_MODE_EVT, // Button
   Car::CarEvents::Car_SET_EVT, // Button
-  Car::CarEvents::Car_TICK_EVT // trigger of seconds, done manually.
+  Car::CarEvents::Car_STATUS_EVT // trigger of seconds, done manually.
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -127,10 +128,9 @@ static int HSM_Car(void)
 {
 Car car;         
   car.onStart();
-  printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
   while (1)  {
     int i;
-    printf("\nEvent[0=mode,1=set,2=tick]->");
+    printf("\nEvent[0=back,1=forward,2=status, 3>=Exit Car]->");
     scanf("%d", &i);
     if (i < 0 || sizeof(carMsg)/sizeof(Msg) <= i) 
       break;
