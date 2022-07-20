@@ -105,7 +105,7 @@ private:
 
 public:
 enum CarEvents {
-  Car_MODE_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
+  Car_RETURN_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
   Car_SET_EVT, /* Pressing the “set” button switches the car into setting mode.  */
   Car_STATUS_EVT /* Shall represent in which status the CAR is.  */
 };
@@ -114,7 +114,7 @@ enum CarEvents {
 
 /* Εvents */
 const Msg carMsg[] = { 
-  Car::CarEvents::Car_MODE_EVT, // Button
+  Car::CarEvents::Car_RETURN_EVT, // Button
   Car::CarEvents::Car_SET_EVT, // Button
   Car::CarEvents::Car_STATUS_EVT // trigger of seconds, done manually.
 };
@@ -126,7 +126,7 @@ const Msg carMsg[] = {
 
 static int HSM_Car(void)
 {
-Car car;         
+  Car car;         
   car.onStart();
   while (1)  {
     int i;

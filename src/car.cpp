@@ -89,7 +89,7 @@ General: Handler definition for each state, covers all events
 Msg const *Car::topHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_STATUS_EVT:
-    printf("Car::top-Handler\n");
+    printf("Car::top\n");
     // individualFunction1();
     return cEventIsProcessed;
   case START_EVT:
@@ -99,7 +99,7 @@ Msg const *Car::topHndlr(Msg const *msg) {
   } 
   return msg;
 }
-/* 
+/*
 Upon return to timekeeping mode the car displays the most recently selected information, that is, 
 if date was selected prior to leaving timekeeping mode, the car resumes displaying the date, 
 otherwise it displays the current time.
@@ -107,7 +107,7 @@ otherwise it displays the current time.
 Msg const *Car::state_offHndlr(Msg const *msg) {
   switch (msg->evt) {
   case Car_STATUS_EVT:
-    printf("Car::off-Handler\n");
+    printf("Car::off\n");
     // individualFunction1();
     return cEventIsProcessed;
   case START_EVT:
@@ -117,7 +117,7 @@ Msg const *Car::state_offHndlr(Msg const *msg) {
     printf("OFF -> ON\n");
     STATE_TRAN(&state_on);
     return cEventIsProcessed;
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     printf("OFF: already off\n");
     return cEventIsProcessed; 
 
@@ -135,11 +135,11 @@ Msg const *Car::state_onHndlr(Msg const *msg) {
     STATE_TRAN(&ss_park);
     return cEventIsProcessed;
   case Car_STATUS_EVT:
-    printf("Car::ON-Handler\n");
+    printf("Car::ON\n");
     // individualFunction1();
     return cEventIsProcessed;
 
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     printf("ON -> OFF");
     STATE_TRAN(&state_off);
     return cEventIsProcessed; 
@@ -156,14 +156,14 @@ Msg const *Car::state_onHndlr(Msg const *msg) {
 Msg const *Car::ss_parkHndlr(Msg const *msg) {
   switch (msg->evt) {
     case Car_STATUS_EVT:
-    printf("Car::PARK-Handler\n");
+    printf("Car::PARK\n");
     // individualFunction1();
     return cEventIsProcessed;
   case Car_SET_EVT:
     printf("PARK -> DRIVE");
     STATE_TRAN(&ss_drive);
     return cEventIsProcessed;
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     printf("PARK -> OFF");
     STATE_TRAN(&state_off);
     return cEventIsProcessed; 
@@ -178,14 +178,14 @@ Msg const *Car::ss_driveHndlr(Msg const *msg) {
   
   switch (msg->evt) {
     case Car_STATUS_EVT:
-    printf("Car::DRIVE-Handler\n");
+    printf("Car::DRIVE\n");
     // individualFunction1();
     return cEventIsProcessed;
   case Car_SET_EVT:
     printf("DRIVE");
-    // STATE_TRAN(&ss_month);
+    STATE_TRAN(&drive_ss_idle);
     return cEventIsProcessed;
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     printf("DRIVE -> PARK\n");
     STATE_TRAN(&ss_park);
     return cEventIsProcessed; 
@@ -200,33 +200,33 @@ Msg const *Car::ss_driveHndlr(Msg const *msg) {
 /*  */
 Msg const *Car::drive_ss_idleHndlr(Msg const *msg) {
   
-  #ifdef LATER
+  
   switch (msg->evt) {
     case Car_STATUS_EVT:
-    printf("Car::IDLE-Handler\n");
+    printf("Car::IDLE\n");
     // individualFunction1();
     return cEventIsProcessed;
   case Car_SET_EVT:
   /* Pressing the “set” button while adjusting month puts the car back into timekeeping mode. */
     STATE_TRAN(&state_off);
-    printf("Car:: go back to timekeeping");
+    printf("Car:: Dr");
     return cEventIsProcessed;
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     if (++dmonth == cMonthInYear+1) 
             dmonth = 1;
     printf("Car::month-SET: month++: %d", dmonth);
     return cEventIsProcessed; 
   } 
-  #endif
+  
   /* While in setting mode the car ignores tick events */
   return msg;
 }
 
 Msg const *Car::drive_ss_drive1Hndlr(Msg const *msg) {
-  #ifdef LATER
+  
   switch (msg->evt) {
     case Car_STATUS_EVT:
-    printf("Car::DRIVE1-Handler\n");
+    printf("Car::DRIVE1\n");
     // individualFunction1();
     return cEventIsProcessed;
   case Car_SET_EVT:
@@ -234,13 +234,13 @@ Msg const *Car::drive_ss_drive1Hndlr(Msg const *msg) {
     STATE_TRAN(&state_off);
     printf("Car:: go back to timekeeping");
     return cEventIsProcessed;
-  case Car_MODE_EVT:
+  case Car_RETURN_EVT:
     if (++dmonth == cMonthInYear+1) 
             dmonth = 1;
     printf("Car::month-SET: month++: %d", dmonth);
     return cEventIsProcessed; 
   } 
-  #endif
+  
   /* While in setting mode the car ignores tick events */
   return msg;
 }
@@ -250,7 +250,7 @@ Msg const *Car::drive_ss_reverseGearHndlr(Msg const *msg) {
   #ifdef LATER
   switch (msg->evt) {
     case Car_STATUS_EVT:
-    printf("Car::REVERSE-Handler\n");
+    printf("Car::REVERSE Gear\n");
     // individualFunction1();
     return cEventIsProcessed;
   case Car_SET_EVT:
