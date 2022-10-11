@@ -55,8 +55,8 @@ protected:
   //substates of state_on
     State ss_park;
     State ss_drive;
-    //substates of substate drive
-      State drive_ss_drive1 ,drive_ss_idle, drive_ss_reverseGear;
+    //substates of substate drive = state(ON)-substate(DRIVE)-substate(idle, drive1, drive2, ReverseGear)
+      State drive_ss_idle, drive_ss_drive1, drive_ss_drive2,  drive_ss_reverseGear;
 
   // 
   State *state_History;
@@ -80,6 +80,7 @@ public:
   Msg const *ss_driveHndlr(Msg const *msg);  
   Msg const *drive_ss_idleHndlr(Msg const *msg);
   Msg const *drive_ss_drive1Hndlr(Msg const *msg);
+  Msg const *drive_ss_drive2Hndlr(Msg const *msg);
   Msg const *drive_ss_reverseGearHndlr(Msg const *msg);
 
   /* Standard functions, to show behaviour */
@@ -88,6 +89,7 @@ public:
   void individualFunction();
   
   /* Consts */
+  
   static constexpr int MODE=0;
   static constexpr int SET=1;
   static constexpr int TICK=2;
@@ -105,7 +107,7 @@ private:
 
 public:
 enum CarEvents {
-  Car_RETURN_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
+  Car_BACK_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
   Car_SET_EVT, /* Pressing the “set” button switches the car into setting mode.  */
   Car_STATUS_EVT /* Shall represent in which status the CAR is.  */
 };
@@ -114,9 +116,9 @@ enum CarEvents {
 
 /* Εvents */
 const Msg carMsg[] = { 
-  Car::CarEvents::Car_RETURN_EVT, // Button
-  Car::CarEvents::Car_SET_EVT, // Button
-  Car::CarEvents::Car_STATUS_EVT // trigger of seconds, done manually.
+  Car::CarEvents::Car_BACK_EVT,   // Button : change state to previous Event, if implemented
+  Car::CarEvents::Car_SET_EVT,    // Button : change state to next state (forward state transition)
+  Car::CarEvents::Car_STATUS_EVT  // Button : shows the status of the current state
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -130,7 +132,7 @@ static int HSM_Car(void)
   car.onStart();
   while (1)  {
     int i;
-    printf("\nEvent[0=back,1=forward,2=status, 3>=Exit Car]->");
+    printf("\nSet Event[0=back, 1=forward, 2=status, 3>=Exit Car(App)]=");
     scanf("%d", &i);
     if (i < 0 || sizeof(carMsg)/sizeof(Msg) <= i) 
       break;
