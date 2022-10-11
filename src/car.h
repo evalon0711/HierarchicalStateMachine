@@ -42,7 +42,8 @@ We apply the HSM pattern according to the following recipe:
 #include <assert.h>
 #include <stdio.h>
 #include "hsm.h"
-
+#include <string>
+#include <vector>
 
 class Car : public Hsm {
  // date parameters
@@ -88,11 +89,14 @@ public:
   void individualFunction1();
   void individualFunction();
   
-  /* Consts */
   
-  static constexpr int MODE=0;
+public:  
+  /* test trigger parameter*/
+  static constexpr int BACK=0;
   static constexpr int SET=1;
-  static constexpr int TICK=2;
+  static constexpr int STATUS=2;
+  static constexpr int REVERSE=3;
+
 
 private:
 
@@ -147,11 +151,7 @@ static int HSM_Car(void)
 }
 
 /* set the date automatically to test if statemachine works */
-static int test_HSM_Car(int hour=7,
-                          int minute=7,
-                          int day=5,
-                          int month=12
-)
+static int test_HSM_Car(std::vector<int> steps, std::string result)
 {
 
   Car car;         
@@ -159,37 +159,12 @@ static int test_HSM_Car(int hour=7,
 
   printf("\n");
   
-  for (int h=0; h<hour; h++)
+  for (auto step : steps)
   {
-    car.onEvent(&carMsg[Car::MODE]); printf("\n");
+    car.onEvent(&carMsg[step]); printf("\n");
   }
-  car.onEvent(&carMsg[Car::SET]); printf("\n");
-
-  for (int m=0; m<minute; m++)
-  {
-    car.onEvent(&carMsg[Car::MODE]); printf("\n");
-  }
-  car.onEvent(&carMsg[Car::SET]); printf("\n");
-
   
-  for (int m=0; m<day-1; m++)
-  {
-    car.onEvent(&carMsg[Car::MODE]); printf("\n");
-  }
-  car.onEvent(&carMsg[Car::SET]); printf("\n");
-
-  for (int m=0; m<month-1; m++)
-  {
-    car.onEvent(&carMsg[Car::MODE]); printf("\n");
-  }
-  // leave setting status
-  car.onEvent(&carMsg[Car::SET]); printf("\n");
-  car.onEvent(&carMsg[Car::TICK]);printf("\n");
-  // show date by clicking mode button
-  car.onEvent(&carMsg[Car::MODE]); printf("\n");
-
-  // printf("\nThe sequence of adjustments in this mode is: hour, minute, day, month.\n\n");
-  printf("\n\nThis is the test function, if 05-12-2018 07:07:01 succeed \n\n");
+  printf("\n\n %s \n\n",result);
   printf("==============================================================\n\n\n\n");
 
   /*  

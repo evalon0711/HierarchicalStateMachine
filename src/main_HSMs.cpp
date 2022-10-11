@@ -17,7 +17,11 @@ int main() {
   // return HSM_Watch();
 
   /* -------------------------------------------------------------------------------------------- */
-  //test_HSM_Car();
+  std::vector<int> car_off_reverse_off = { Car::SET,Car::SET,Car::SET,Car::SET,Car::REVERSE,Car::SET,Car::BACK,Car::BACK,Car::BACK};
+  std::string car_off_reverse_off_result="You should see the reverse gear and that the car is off again.";
+
+  test_HSM_Car(car_off_reverse_off,car_off_reverse_off_result);
+  
   return HSM_Car();
 
 

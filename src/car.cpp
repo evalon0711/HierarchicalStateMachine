@@ -208,7 +208,7 @@ Msg const *Car::drive_ss_idleHndlr(Msg const *msg) {
     return cEventIsProcessed;
 
   case Car_BACK_EVT:
-    STATE_TRAN(&drive_ss_idle);
+    STATE_TRAN(&ss_drive);
     printf("Car::DRIVE::IDLE");
     return cEventIsProcessed;  
 
