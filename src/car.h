@@ -44,6 +44,7 @@ We apply the HSM pattern according to the following recipe:
 #include "hsm.h"
 #include <string>
 #include <vector>
+#include <iostream>
 
 class Car : public Hsm {
  // date parameters
@@ -164,7 +165,7 @@ static int test_HSM_Car(std::vector<int> steps, std::string result)
     car.onEvent(&carMsg[step]); printf("\n");
   }
   
-  printf("\n\n %s \n\n",result);
+  std::cout << result << std::endl;
   printf("==============================================================\n\n\n\n");
 
   /*  
