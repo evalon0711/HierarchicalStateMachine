@@ -210,10 +210,14 @@ Msg const *Car::drive_ss_idleHndlr(Msg const *msg) {
   case Car_BACK_EVT:
     STATE_TRAN(&drive_ss_idle);
     printf("Car::DRIVE::IDLE");
-    return cEventIsProcessed;    
+    return cEventIsProcessed;  
+
+  case Car_REVERSE_EVT:
+    STATE_TRAN(&drive_ss_reverseGear);
+    printf("Car::DRIVE::REVERSE_GEAR");
+    return cEventIsProcessed;  
  } 
   
-
   return msg;
 }
 

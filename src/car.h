@@ -106,10 +106,12 @@ private:
   const Msg* cEventIsProcessed=0;
 
 public:
+
 enum CarEvents {
   Car_BACK_EVT,/* Adjustments are made by pressing the “mode” button, which increments the chosen quantity by one. */
   Car_SET_EVT, /* Pressing the “set” button switches the car into setting mode.  */
-  Car_STATUS_EVT /* Shall represent in which status the CAR is.  */
+  Car_STATUS_EVT, /* Shall represent in which status the CAR is.  */
+  Car_REVERSE_EVT /* Shall represent in which status the CAR is.  */
 };
 
 };
@@ -118,7 +120,8 @@ enum CarEvents {
 const Msg carMsg[] = { 
   Car::CarEvents::Car_BACK_EVT,   // Button : change state to previous Event, if implemented
   Car::CarEvents::Car_SET_EVT,    // Button : change state to next state (forward state transition)
-  Car::CarEvents::Car_STATUS_EVT  // Button : shows the status of the current state
+  Car::CarEvents::Car_STATUS_EVT,  // Button : shows the status of the current state
+  Car::CarEvents::Car_REVERSE_EVT // Button : only needed for reverse gear from idle (-> Reverse or -> Drive1)
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -132,7 +135,7 @@ static int HSM_Car(void)
   car.onStart();
   while (1)  {
     int i;
-    printf("\nSet Event[0=back, 1=forward, 2=status, 3>=Exit Car(App)]=");
+    printf("\nSet Event[0=back, 1=forward, 2=status, 3=reverseGear 4>=Exit Car(App)]=");
     scanf("%d", &i);
     if (i < 0 || sizeof(carMsg)/sizeof(Msg) <= i) 
       break;
